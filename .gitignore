@@ -1,3 +1,7 @@
 pyproject.toml
 poetry.lock
 *.py[cod]
+
+dist/
+build/
+*.egg-info/
