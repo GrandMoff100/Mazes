@@ -1,0 +1,2 @@
+language = "python3"
+run = "python main.py generate 10x7 --show-creation --update-wait=0.5"

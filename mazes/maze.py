@@ -75,6 +75,29 @@ class Wall:
         grid_p1.connections.remove(grid_p2)
         grid_p2.connections.remove(grid_p1)
 
+    def edge_walls(self):
+        m = self.p1.maze
+        w, h = m.width, m.height
+        for i in range(w - 1):
+            for j in range(h - 1):
+                yield Wall(
+                    m.point(i, 0),
+                    m.point(i + 1, 0)
+                )
+                yield Wall(
+                    m.point(i, h),
+                    m.point(i + 1, h)
+                )
+                yield Wall(
+                    m.point(0, j),
+                    m.point(0, j + 1)
+                )
+                yield Wall(
+                    m.point(w, j),
+                    m.point(w, j + 1)
+                )
+
+
 
 class Cell:
     def __init__(self, x, y, maze):
@@ -216,11 +239,23 @@ class Maze:
 
 
 class Generator:
-    def __init__(self, maze: Maze, show_updates=False):
+    def __init__(
+        self, maze: Maze,
+        show_updates=False,
+        update_wait=1,
+        start=None,
+        end=None
+    ):
         self.maze = maze
-        self.start = maze.cell(0, maze.height - 2)
-        self.end = maze.cell(maze.width - 2, 0)
+        if start is None:
+            start = 0, maze.height - 2
+        if end is None:
+            end = maze.width - 2, 0
+
+        self.start = maze.cell(*start)
+        self.end = maze.cell(*end)
         self.show_updates = show_updates
+        self.update_wait = update_wait
 
         self.visited = {
             j: {
@@ -258,7 +293,7 @@ class Generator:
         self.stack.append(choice)
         if self.show_updates:
             print(self.maze.show(3))
-            time.sleep(1)
+            time.sleep(self.update_wait)
         return self.step()
 
     def backtrack(self):
@@ -269,4 +304,12 @@ class Generator:
                 return
             self.stack.pop(-1)
             self.backtrack()
+    
+    def remove_start_to_end_walls(self):
+        def edge_cell_walls(cell):
+            for wall in cell.walls.values():
+                if wall in wall.edge_walls():
+                    yield wall
+        random.choice(list(edge_cell_walls(self.start))).remove()
+        random.choice(list(edge_cell_walls(self.end))).remove()
 
