@@ -16,6 +16,15 @@ class Point:
     def __repr__(self):
         return '<Point {},{}>'.format(self.x, self.y)
 
+    def __lt__(self, point):
+        return self._sortvalue() < point._sortvalue()
+    
+    def __le__(self, point):
+        return self._sortvalue() <= point._sortvalue()
+
+    def _sortvalue(self):
+        return self.y * self.maze.width + self.x
+
     def collapse(self):
         self.connections = list(self.connections)
     
@@ -85,16 +94,16 @@ class Wall:
                     m.point(i + 1, 0)
                 )
                 yield Wall(
-                    m.point(i, h),
-                    m.point(i + 1, h)
+                    m.point(i, h - 1),
+                    m.point(i + 1, h - 1)
                 )
                 yield Wall(
                     m.point(0, j),
                     m.point(0, j + 1)
                 )
                 yield Wall(
-                    m.point(w, j),
-                    m.point(w, j + 1)
+                    m.point(w - 1, j),
+                    m.point(w - 1, j + 1)
                 )
 
 
@@ -158,21 +167,21 @@ class Maze:
     PLAYER_CHARACTER = '■'
 
     WALL_CHARACTERS = {
-        'lr': '─',
-        'ld': '┐',
-        'lu': '┘',
-        'lrd': '┬',
-        'lru': '┴',
-        'ldu': '┤',
-        'lrdu': '┼',
-        'rd': '┌',
-        'ru': '└',
-        'rdu': '├',
-        'du': '│',
-        'r': '╶',
-        'l': '╴',
-        'd': '╷',
-        'u': '╵',
+        'lr': '━',
+        'ld': '┓',
+        'lu': '┛',
+        'lrd': '┳',
+        'lru': '┻',
+        'ldu': '┫',
+        'lrdu': '╋',
+        'rd': '┏',
+        'ru': '┗',
+        'rdu': '┣',
+        'du': '┃',
+        'r': '╺',
+        'l': '╸',
+        'd': '╻',
+        'u': '╹',
         '': ' '
     }
 
@@ -236,6 +245,7 @@ class Maze:
     def generate(self, *args, **kwargs):
         gen = Generator(self, *args, **kwargs)
         gen.step()
+        gen.remove_start_to_end_walls()
 
 
 class Generator:
