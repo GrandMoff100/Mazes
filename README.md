@@ -30,3 +30,5 @@ Commands:
 ```
 
 ## Examples
+
+<img src="https://raw.githubusercontent.com/GrandMoff100/Mazes/master/images/mazesV2.gif">
