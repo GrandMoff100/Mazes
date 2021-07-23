@@ -3,7 +3,10 @@ from setuptools import setup
 
 setup(
     name="Mazes",
-    version="0.1.1",
+    version="0.1.2",
+    url="https://github.com/GrandMoff100/Mazes",
+    author="GrandMoff100",
+    author_email="nlarsen23.student@gmail.com",
     install_requires=["colorama"],
     packages=["mazes"],
     long_description=open('README.md', 'r').read(),
