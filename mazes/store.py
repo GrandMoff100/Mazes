@@ -29,6 +29,12 @@ class MazeIO:
         with open(pathlib.Path(self.MAZES_DIRECTORY, file), 'rb') as f:
             return pickle.load(f)
 
+    def delete_maze(self, file):
+        try:
+            os.remove(pathlib.Path(self.MAZES_DIRECTORY, file))
+        except FileNotFoundError:
+            print('File not found :(')
+
     def save_maze(self, maze, name=None):
         if name is None:
             name = self.next_unnamed()

@@ -1,5 +1,9 @@
 # Mazes
 
+## Examples
+<img src="https://raw.githubusercontent.com/GrandMoff100/Mazes/master/images/mazesV2.gif">
+
+
 ## Installation
 ```py
 # Install with pip from pypi
@@ -26,9 +30,4 @@ Commands:
   list      Lists the maze files that are saved in ~/.mazes
   show      Displays the maze content of maze files
   solve     Solves mazes that are generated.
-
 ```
-
-## Examples
-
-<img src="https://raw.githubusercontent.com/GrandMoff100/Mazes/master/images/mazesV2.gif">

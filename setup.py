@@ -3,11 +3,11 @@ from setuptools import setup
 
 setup(
     name="Mazes",
-    version="0.1.2",
+    version="0.2.0",
     url="https://github.com/GrandMoff100/Mazes",
     author="GrandMoff100",
     author_email="nlarsen23.student@gmail.com",
-    install_requires=["colorama"],
+    install_requires=["colorama", "termcolor"],
     packages=["mazes"],
     long_description=open('README.md', 'r').read(),
     long_description_content_type="text/markdown",
@@ -16,5 +16,5 @@ setup(
         'console_scripts': [
             'mazes = mazes.cli:cli',
         ],
-    },
+    }
 )

@@ -2,6 +2,8 @@ import random
 import time
 import colorama
 
+from termcolor import colored
+
 
 colorama.init()
 
@@ -107,7 +109,6 @@ class Wall:
                 )
 
 
-
 class Cell:
     def __init__(self, x, y, maze):
         self.x = x
@@ -167,22 +168,22 @@ class Maze:
     PLAYER_CHARACTER = '■'
 
     WALL_CHARACTERS = {
-        'lr': '━',
-        'ld': '┓',
-        'lu': '┛',
-        'lrd': '┳',
-        'lru': '┻',
-        'ldu': '┫',
-        'lrdu': '╋',
-        'rd': '┏',
-        'ru': '┗',
-        'rdu': '┣',
-        'du': '┃',
-        'r': '╺',
-        'l': '╸',
-        'd': '╻',
-        'u': '╹',
-        '': ' '
+        'lr': '─━',
+        'ld': '┐┓',
+        'lu': '┘┛',
+        'lrd': '┬┳',
+        'lru': '┴┻',
+        'ldu': '┤┫',
+        'lrdu': '┼╋',
+        'rd': '┌┏',
+        'ru': '└┗',
+        'rdu': '├┣',
+        'du': '│┃',
+        'r': '╶╺',
+        'l': '╴╸',
+        'd': '╷╻',
+        'u': '╵╹',
+        '': '  '
     }
 
     DIRECTION_ORDER = 'lrdu'
@@ -216,31 +217,36 @@ class Maze:
             for j in range(self.height):
                 self.point(i, j).collapse()
 
-    def show(self, mx=1):
+    def show(self, bold=False, color=None, background=None):
         def horizontal_connectors():
             for j in range(self.height):
                 for i in range(self.width):
                     p = self.point(i, j)
                     char = [p.direction(adj_p) for adj_p in p.connections]
-                    yield self.WALL_CHARACTERS[''.join(sorted(char, key=lambda x: self.DIRECTION_ORDER.index(x)))]
+                    yield self.WALL_CHARACTERS[''.join(sorted(char, key=lambda x: self.DIRECTION_ORDER.index(x)))][int(bold)]
                     if p.is_connected(Point(i + 1, j, self)):
-                        yield self.WALL_CHARACTERS['lr'] * mx
+                        yield self.WALL_CHARACTERS['lr'][int(bold)] * 3
                     else:
-                        yield ' ' * mx
+                        if i < self.width - 1:
+                            yield ' ' * 3
                 yield '\n'
         def vertical_connectors():
             for j in range(self.height - 1):
                 for i in range(self.width):
                     if self.point(i, j).is_connected(Point(i, j + 1, self)):
-                        yield self.WALL_CHARACTERS['du']
+                        yield self.WALL_CHARACTERS['du'][int(bold)]
                     else:
                         yield ' '
                     if i < self.width - 1:
-                        yield ' ' * mx
+                        yield ' ' * 3
                 yield '\n'
         all_lines = '\n%s\n'.join(''.join(horizontal_connectors()).splitlines())
         in_between_lines = ''.join(vertical_connectors()).splitlines()
-        return colorama.ansi.clear_screen() + all_lines % tuple(in_between_lines)
+        return colorama.ansi.clear_screen() + colored(
+            all_lines % tuple(in_between_lines),
+            color=color,
+            on_color=background
+        )
 
     def generate(self, *args, **kwargs):
         gen = Generator(self, *args, **kwargs)
@@ -302,7 +308,7 @@ class Generator:
         self.current_cell.remove_wall(d)
         self.stack.append(choice)
         if self.show_updates:
-            print(self.maze.show(3))
+            print(self.maze.show())
             time.sleep(self.update_wait)
         return self.step()
 
