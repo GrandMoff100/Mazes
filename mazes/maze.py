@@ -242,11 +242,13 @@ class Maze:
                 yield '\n'
         all_lines = '\n%s\n'.join(''.join(horizontal_connectors()).splitlines())
         in_between_lines = ''.join(vertical_connectors()).splitlines()
-        return colorama.ansi.clear_screen() + colored(
-            all_lines % tuple(in_between_lines),
+        output = all_lines % tuple(in_between_lines)
+        output = '\n'.join([colored(
+            line,
             color=color,
             on_color=background
-        )
+        ) for line in output.splitlines()])
+        return colorama.ansi.clear_screen() + output
 
     def generate(self, *args, **kwargs):
         gen = Generator(self, *args, **kwargs)
