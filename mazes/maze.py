@@ -232,7 +232,7 @@ class Maze:
         return colorama.ansi.clear_screen() + output
 
     def generate(self, *args, **kwargs):
-        gen = Generator(self, *args, **kwargs)
+        gen = Generator(maze=self, *args, **kwargs)
         gen.step()
         gen.remove_start_to_end_walls()
 
@@ -253,6 +253,11 @@ class Generator:
             j: {i: False for i in range(maze.width - 1)} for j in range(maze.height - 1)
         }
         self.stack = [self.start]
+        self.morph_gen()
+
+    def morph_gen(self) -> None:
+        self.__class__ = self.config.algo  # pylint: disable=invalid-class-object
+        # cls.__post_init__ ?
 
     @property
     def current_cell(self):
@@ -268,6 +273,24 @@ class Generator:
         for cell in self.current_cell.adjacent_cells():
             if not self.is_visited(cell.x, cell.y):
                 yield cell
+
+    def step(self):
+        pass
+
+    def remove_start_to_end_walls(self):
+        def edge_cell_walls(cell):
+            for wall in cell.walls.values():
+                if wall in wall.edge_walls():
+                    yield wall
+
+        random.choice(list(edge_cell_walls(self.start))).remove()
+        random.choice(list(edge_cell_walls(self.end))).remove()
+
+
+class Backtrack(Generator):
+    """Randomly moves through the mazes until it hits a dead-end and backtracks to fill the maze."""
+
+    name = "backtrack"
 
     def step(self):
         if len(self.stack) == 0:
@@ -294,12 +317,3 @@ class Generator:
                 return
             self.stack.pop(-1)
             self.backtrack()
-
-    def remove_start_to_end_walls(self):
-        def edge_cell_walls(cell):
-            for wall in cell.walls.values():
-                if wall in wall.edge_walls():
-                    yield wall
-
-        random.choice(list(edge_cell_walls(self.start))).remove()
-        random.choice(list(edge_cell_walls(self.end))).remove()
