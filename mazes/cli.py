@@ -2,12 +2,19 @@ import click
 import colorama
 
 from mazes import Maze
+from mazes.config import Config
+from mazes.maze import Generator
+from mazes.params import (
+    AlgorithmParamType,
+    ColorParamType,
+    DimensionsParamType,
+    MazeFileParamType,
+)
 from mazes.store import MazeIO
-
-from .params import ColorParamType, DimensionsParamType, MazeFileParamType
 
 MAZE_STORE = MazeIO()
 MAZE_FILE = MazeFileParamType(MAZE_STORE)
+ALGORITHM = AlgorithmParamType()
 DIMENSIONS = DimensionsParamType()
 COLOR = ColorParamType()
 
@@ -21,14 +28,28 @@ def cli():
 
 
 @cli.command(name="generate")
-@click.argument("dimensions", type=DIMENSIONS)
+@click.argument("dimensions", type=DIMENSIONS, envvar="MAZES_DIMENSIONS")
 @click.option("-n", "--name")
-@click.option("-s", "--show-creation", is_flag=True)
-@click.option("--update-wait", type=float, default=1)
-def cli_generate(dimensions: tuple, update_wait: int, name=None, show_creation=False):
+@click.option("-s", "--show-creation", is_flag=True, envvar="SHOW_MAZE_CREATION")
+@click.option("--update-wait", type=float, default=1, envvar="UPDATE_WAIT")
+@click.option(
+    "-a",
+    "--algorithm",
+    envvar="GENERATION_ALGORITHM",
+    type=ALGORITHM,
+    default="backtrack",
+    help="The algorithm to generate a maze with. List available algoithms with `mazes algorithms`",
+)
+def cli_generate(
+    dimensions: tuple, update_wait: int, algorithm: str, name=None, show_creation=True
+):
     """Generates mazes using a recursive backtracker algorithm."""
     maze = Maze(*dimensions)
-    maze.generate(show_updates=show_creation, update_wait=update_wait)
+    maze.generate(
+        config=Config(
+            show_updates=show_creation, update_wait=update_wait, algo=algorithm
+        )
+    )
     click.echo(colorama.ansi.clear_screen())
     name = MAZE_STORE.save_maze(maze, name)
     click.echo('{}x{} maze saved as "{}"'.format(*dimensions, name))
@@ -51,6 +72,13 @@ def cli_solve():
 def cli_list():
     """Lists the maze files that are saved in ~/.mazes"""
     click.echo(MAZE_STORE.list_mazes())
+
+
+@cli.command("algorithms")
+@click.argument("algorithm", required=False)
+def cli_algorithms():
+    algos = [cls.name for cls in Generator.__subclasses__()]
+    click.echo(" ".join(algos))
 
 
 @cli.command(name="show")
