@@ -28,7 +28,7 @@ def cli():
 
 
 @cli.command(name="generate")
-@click.argument("dimensions", type=DIMENSIONS, envvar="MAZES_DIMENSIONS")
+@click.argument("dimensions", type=DIMENSIONS, envvar="MAZE_DIMENSIONS")
 @click.option("-n", "--name")
 @click.option("-s", "--show-creation", is_flag=True, envvar="SHOW_MAZE_CREATION")
 @click.option("--update-wait", type=float, default=1, envvar="UPDATE_WAIT")
@@ -75,10 +75,14 @@ def cli_list():
 
 
 @cli.command("algorithms")
-@click.argument("algorithm", required=False)
-def cli_algorithms():
-    algos = [cls.name for cls in Generator.__subclasses__()]
-    click.echo(" ".join(algos))
+@click.argument("algorithm", type=ALGORITHM, required=False)
+def cli_algorithms(algorithm):
+    """List the algorithms available to generate and/or solve mazes with."""
+    if algorithm is None:
+        algos = [cls.name for cls in Generator.__subclasses__()]
+        click.echo(" ".join(algos))
+    else:
+        click.echo(algorithm.__doc__)
 
 
 @cli.command(name="show")
