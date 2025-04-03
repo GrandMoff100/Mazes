@@ -29,5 +29,5 @@ Commands:
   generate  Generates mazes using the recursive backtracker...
   list      Lists the maze files that are saved in ~/.mazes
   show      Displays the maze content of maze files
-  solve     Solves mazes that are generated.
+  solve     Solves mazes that are generated. (Not implemented yet)
 ```
